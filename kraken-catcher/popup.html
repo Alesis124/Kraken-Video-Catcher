@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Segoe UI',system-ui,sans-serif;
+      background:#0f0f13;color:#e2e8f0;
+      width:460px;min-height:180px;max-height:600px;
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    header{
+      background:#16213e;padding:12px 14px;
+      display:flex;align-items:center;justify-content:space-between;
+      border-bottom:1px solid #2d3748;flex-shrink:0;
+    }
+    .logo{display:flex;align-items:center;gap:8px}
+    .logo-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      overflow:hidden;box-shadow:0 0 0 2px #2d3748,0 0 10px rgba(229,62,62,.35)}
+    .logo-icon img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+    .logo-name{font-size:13px;font-weight:700;color:#f7fafc}
+    .logo-sub{font-size:10px;color:#718096;margin-top:1px}
+    .btn-sm{background:#2d3748;border:1px solid #4a5568;color:#a0aec0;
+      font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer}
+    .btn-sm:hover{background:#3d4a5c;color:#e2e8f0}
+
+    #statusbar{padding:7px 14px;font-size:11px;color:#718096;
+      background:#13131a;border-bottom:1px solid #1e2533;flex-shrink:0}
+    #statusbar b{color:#fc8181}
+
+    #list{overflow-y:auto;flex:1;padding:8px;display:flex;flex-direction:column;gap:8px}
+    #list::-webkit-scrollbar{width:4px}
+    #list::-webkit-scrollbar-thumb{background:#2d3748;border-radius:2px}
+
+    .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:36px 20px;color:#4a5568;text-align:center;gap:8px}
+    .empty-icon{font-size:34px;opacity:.5}
+    .empty-title{font-size:13px;font-weight:600;color:#718096}
+    .empty-sub{font-size:11px;color:#4a5568;line-height:1.5}
+
+    .card{background:#1a1a2e;border:1px solid #2d3748;border-radius:9px;
+      padding:11px 12px;display:flex;flex-direction:column;gap:8px}
+    .card:hover{border-color:#4a5568}
+
+    .card-top{display:flex;align-items:center;gap:6px}
+    .badge{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;
+      text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
+    .badge-m3u8{background:#2a4365;color:#63b3ed}
+    .badge-mpd{background:#2d3a1e;color:#68d391}
+    .badge-mp4{background:#44337a;color:#d6bcfa}
+    .badge-other{background:#2d3748;color:#a0aec0}
+    .card-ct{font-size:10px;color:#4a5568;margin-left:4px;font-style:italic;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+    .card-time{font-size:10px;color:#4a5568;margin-left:auto;white-space:nowrap}
+
+    .url-pill{background:#0d0d18;border:1px solid #2d3748;border-radius:5px;
+      padding:5px 8px;font-size:10px;color:#90cdf4;word-break:break-all;
+      line-height:1.4;max-height:48px;overflow:hidden;cursor:pointer;transition:background .1s}
+    .url-pill:hover{background:#111127}
+
+    .name-row{display:flex;align-items:center;gap:6px}
+    .name-label{font-size:10px;color:#718096;white-space:nowrap}
+    .name-input{flex:1;background:#0d0d18;border:1px solid #2d3748;border-radius:5px;
+      color:#e2e8f0;font-size:11px;padding:4px 8px;outline:none;font-family:inherit}
+    .name-input:focus{border-color:#4a90e2}
+
+    .actions{display:flex;gap:5px}
+    .btn-action{flex:1;padding:7px 4px;border-radius:6px;border:none;font-size:11px;
+      font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      gap:4px;transition:all .15s;white-space:nowrap}
+    .btn-url{background:#2d3748;color:#e2e8f0;border:1px solid #4a5568}
+    .btn-url:hover{background:#3d4a5c}
+    .btn-ffmpeg{background:#1a3a5c;color:#90cdf4;border:1px solid #2c5282}
+    .btn-ffmpeg:hover{background:#2c5282}
+    .btn-dl{background:#1a4731;color:#9ae6b4;border:1px solid #276749;font-size:12px}
+    .btn-dl:hover{background:#276749}
+    .btn-dl:disabled{background:#1a2a1a;color:#4a5568;border-color:#2d3d2d;cursor:not-allowed}
+    .btn-action.ok{background:#1a4731!important;border-color:#38a169!important;color:#9ae6b4!important}
+
+    /* Barra de progreso */
+    .progress-wrap{display:none;flex-direction:column;gap:4px}
+    .progress-wrap.active{display:flex}
+    .progress-bar-bg{background:#1e2533;border-radius:4px;height:8px;overflow:hidden}
+    .progress-bar-fill{height:100%;border-radius:4px;transition:width .3s;
+      background:linear-gradient(90deg,#38a169,#68d391)}
+    .progress-text{font-size:10px;color:#718096;display:flex;justify-content:space-between}
+    .progress-status{font-size:10px;font-weight:600}
+    .progress-status.done{color:#68d391}
+    .progress-status.error{color:#fc8181}
+    .progress-status.loading{color:#63b3ed}
+
+    footer{padding:7px 14px;font-size:10px;color:#4a5568;
+      border-top:1px solid #1e2533;text-align:center;flex-shrink:0}
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-icon"><img src="icon128.png" alt="Kraken Video Catcher"/></div>
+    <div>
+      <div class="logo-name">Kraken Video Catcher</div>
+      <div class="logo-sub">Capturador de streams</div>
+    </div>
+  </div>
+  <button class="btn-sm" id="btn-clear">Limpiar</button>
+</header>
+<div id="statusbar">Esperando vídeos…</div>
+<div id="list"></div>
+<footer>Descarga directa · Copia URL · Copia comando ffmpeg</footer>
+<script src="popup.js"></script>
+</body>
+</html>
